@@ -1,0 +1,404 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gadiness.kimaru.ussdhelper.fragment.SettingsFragment">
+    <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:padding="@dimen/activity_horizontal_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactItem1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appSettingsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactItem1"
+                    android:text="@string/app_name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appSettingsTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactItem1"
+                    android:text="@string/app_description"
+                    android:id="@+id/appdescription"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkState1"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appCloudUrl"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appUrlTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactItem"
+                    android:text="Cloud URL"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appUrlTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactItem"
+                    android:text=""
+                    android:id="@+id/appUrl"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkState"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <include layout="@layout/item_divider" />
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appApiView"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivItem"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/baseApiVersionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivItem"
+                    android:text="API Version"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/baseApiVersionTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivItem"
+                    android:text=""
+                    android:id="@+id/baseApiVersion"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkStateS"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <include layout="@layout/item_divider" />
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appUssdCode"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactUssd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appUssdTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactUssd"
+                    android:text="Base USSD Code"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appUssdTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactUssd"
+                    android:text=""
+                    android:id="@+id/baseUssdCode"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkUssd"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <include layout="@layout/item_divider" />
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appUssdEndpoint"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactUssdEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appUssdEndpointTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactUssdEnd"
+                    android:text="USSD Endpoint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appUssdEndpointTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactUssdEnd"
+                    android:text=""
+                    android:id="@+id/baseUssdEndpoint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkUssd1"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+
+            <include layout="@layout/item_divider" />
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appPhoneEndpoint"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactphoneEnd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appPhoneEndpointTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactphoneEnd"
+                    android:text="Phone Endpoint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appPhoneEndpointTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactphoneEnd"
+                    android:text=""
+                    android:id="@+id/basePhoneEndpoint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkPhone1"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <include layout="@layout/item_divider" />
+            <include layout="@layout/item_divider" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:id="@+id/appPhoneJson"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/ivContactphonejson"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:src="@drawable/ic_home_black_24dp" />
+
+                <TextView
+                    android:id="@+id/appPhoneTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_toEndOf="@id/ivContactphonejson"
+                    android:text="Phone JSON Root"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/appPhoneTitle"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="8dp"
+                    android:layout_toEndOf="@id/ivContactphonejson"
+                    android:text=""
+                    android:id="@+id/basePhoneJsonRoot"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="#727272" />
+
+                <ToggleButton
+                    android:id="@+id/chkPhonejson"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:background="@drawable/toggle_selector"
+                    android:checked="true"
+                    android:padding="6dp"
+                    android:visibility="invisible"
+                    android:textOff=""
+                    android:textOn="" />
+            </RelativeLayout>
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:alpha="0.3"
+                android:src="@drawable/ic_settings_black_24dp" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</FrameLayout>
