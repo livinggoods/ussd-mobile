@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 
 import com.gadiness.kimaru.ussdhelper.mzigos.PhoneQueue;
+import com.gadiness.kimaru.ussdhelper.mzigos.Queue;
 import com.gadiness.kimaru.ussdhelper.mzigos.UssdMessage;
 
 import org.json.JSONArray;
@@ -16,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.icu.lang.UProperty.MATH;
@@ -27,7 +30,9 @@ import static android.icu.lang.UProperty.MATH;
 public class UssdDbHelper extends SQLiteOpenHelper{
     public static final String USSD_TABLE_NAME="ussd_messages";
     public static final String PHONE_QUEUE_TABLE_NAME="phone_queue";
+    public static final String UPSTREAM_QUEUE_TABLE="queues";
     public static final String PHONE_JSON_ROOT="phones";
+    public static final String UPSTREAM_QUEUE_JSON_ROOT="queue";
     public static final String USSD_JSON_ROOT="messages";
     public static final String DATABASE_NAME= "ussd.db";
     public static final int DATABASE_VERSION= 1;
@@ -50,6 +55,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     public static final String SENT = "sent";
     public static final String MESSAGE = "message";
     public static final String PHONE_ID = "phone_id";
+    public static final String QUEUE_ID = "queue_id";
     public static final String BUNDLE_BALANCE = "bundle_balance";
     public static final String EXPIRY_DATETIME = "expiry_datetime";
     public static final String MESSAGE_TYPE_ID = "message_type_id";
@@ -57,22 +63,48 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     public static final String ACTIVE = "active";
     public static final String DELETED = "deleted";
     public static final String SYNCED = "synced";
+    public static final String ASSIGNED_TO = "assigned_to";
+    public static final String BRANCH_NAME = "branch_name";
+    public static final String NAME = "name";
+    public static final String COMPLETED = "completed";
+    public static final String SELECTED = "selected";
 
     String [] ussdMessageColumns=new String[]{ID, PHONE_NUMBER, MESSAGE, BRANCH_ID, PHONE_ID,
-            BUNDLE_BALANCE, EXPIRY_DATETIME, MESSAGE_TYPE_ID, COUNTRY, DATE_ADDED, ACTIVE, DELETED};
+            BUNDLE_BALANCE, EXPIRY_DATETIME, MESSAGE_TYPE_ID, COUNTRY, DATE_ADDED, ACTIVE, DELETED, QUEUE_ID};
 
     String [] phoneQueueColumns = new String[] {ID, BRANCH_ID, PHONE_NUMBER, STATUS,
-            ERROR_MESSAGE, COUNTRY, SENT, DELETED};
+            ERROR_MESSAGE, COUNTRY, SENT, DELETED, QUEUE_ID, ASSIGNED_TO, BRANCH_NAME, PHONE_ID, SYNCED};
+
+    String [] upstreamQueueCols = new String []{ID, BRANCH_ID, BRANCH_NAME, NAME, STATUS, COUNTRY,
+            DELETED, DATE_ADDED, COMPLETED, SELECTED};
 
     public static final String CREATE_QUEUE_TABLE="CREATE TABLE " + PHONE_QUEUE_TABLE_NAME + "("
             + ID + primary_field + ", "
             + BRANCH_ID + integer_field + ", "
+            + BRANCH_NAME + varchar_field + ", "
             + PHONE_NUMBER + varchar_field + ", "
+            + PHONE_ID + integer_field + ", "
             + STATUS + integer_field + ", "
             + ERROR_MESSAGE + text_field + ", "
             + COUNTRY + varchar_field + ", "
             + SENT + real_field + ", "
             + DELETED + real_field + ", "
+            + QUEUE_ID + integer_field + ", "
+            + ASSIGNED_TO + varchar_field + ", "
+            + DATE_ADDED + real_field + ", "
+            + SYNCED + integer_field + "); ";
+
+    public static final String CREATE_UPSTREAM_QUEUE ="CREATE TABLE " + UPSTREAM_QUEUE_TABLE + "("
+            + ID + primary_field + ", "
+            + BRANCH_ID + integer_field + ", "
+            + BRANCH_NAME + varchar_field + ", "
+            + NAME + varchar_field + ", "
+            + STATUS + integer_field + ", "
+            + COUNTRY + integer_field + ", "
+            + DELETED + real_field + ", "
+            + DATE_ADDED + real_field + ", "
+            + COMPLETED + real_field + ", "
+            + SELECTED + integer_field + ", "
             + SYNCED + integer_field + "); ";
 
     public static final String CREATE_MESSAGE_TABLE="CREATE TABLE " + USSD_TABLE_NAME + "("
@@ -86,6 +118,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             + MESSAGE_TYPE_ID + integer_field + ", "
             + COUNTRY + varchar_field + ", "
             + DATE_ADDED + real_field + ", "
+            + QUEUE_ID + real_field + ", "
             + ACTIVE + real_field + ", "
             + DELETED + real_field + ", "
             + SYNCED + integer_field + "); ";
@@ -94,27 +127,36 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     public static final String PHONE_DROP="DROP TABLE IF EXISTS" + PHONE_QUEUE_TABLE_NAME;
 
     public UssdDbHelper(Context context) {
-        super(context, PHONE_QUEUE_TABLE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+        if (!isTableExists(UPSTREAM_QUEUE_TABLE)){
+            createUpstreamQueueTable();
+        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_MESSAGE_TABLE);
         db.execSQL(CREATE_QUEUE_TABLE);
+        db.execSQL(CREATE_UPSTREAM_QUEUE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(USSD_DROP);
-        db.execSQL(PHONE_DROP);
+
     }
+
+    private void createUpstreamQueueTable(){
+        SQLiteDatabase db = getReadableDatabase();
+        db.execSQL(CREATE_UPSTREAM_QUEUE);
+    }
+
 
     public long addUssdMessage(UssdMessage message) {
 
         SQLiteDatabase db=getWritableDatabase();
         ContentValues cv=new ContentValues();
-        cv.put(ID, message.getId());
+        // cv.put(ID, message.getId());
         cv.put(PHONE_NUMBER, message.getPhoneNumber());
         cv.put(MESSAGE, message.getMessage());
         cv.put(BRANCH_ID, message.getBranchId());
@@ -127,16 +169,38 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         cv.put(ACTIVE, message.isActive());
         cv.put(DELETED, message.isDeleted());
         cv.put(SYNCED, message.isSynced());
+        cv.put(QUEUE_ID, message.getQueueId());
         long id;
-        if (isExist(message)){
-            cv.put(SYNCED, false);
-            id = db.update(USSD_TABLE_NAME, cv, ID+"='"+message.getId()+"'", null);
-        }else{
-            id = db.insertWithOnConflict(USSD_TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
-        }
+        id = db.insert(USSD_TABLE_NAME, null, cv);
         db.close();
         return id;
     }
+
+    public long deletePhoneQueue(PhoneQueue phoneQueue) {
+        SQLiteDatabase db = getReadableDatabase();
+        //db.delete(DATABASE_TABLE, KEY_NAME + "=" + name, null) > 0;
+
+        String whereClause = ID+" = ?";
+        String[] whereArgs = new String[] {
+                String.valueOf(phoneQueue.getId()),
+        };
+        int status=db.delete(PHONE_QUEUE_TABLE_NAME,whereClause,whereArgs);
+        return status;
+    }
+
+
+    public long deleteUssdMessage(UssdMessage message) {
+        SQLiteDatabase db = getReadableDatabase();
+        //db.delete(DATABASE_TABLE, KEY_NAME + "=" + name, null) > 0;
+
+        String whereClause = ID+" = ?";
+        String[] whereArgs = new String[] {
+                String.valueOf(message.getId()),
+        };
+        int status=db.delete(USSD_TABLE_NAME,whereClause,whereArgs);
+        return status;
+    }
+
     public List<UssdMessage> getUssdMessages() {
         SQLiteDatabase db=getReadableDatabase();
         Cursor cursor=db.query(USSD_TABLE_NAME,ussdMessageColumns,null,null,null,null,null,null);
