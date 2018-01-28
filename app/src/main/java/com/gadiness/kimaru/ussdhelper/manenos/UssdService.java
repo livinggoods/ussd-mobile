@@ -8,6 +8,10 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
+import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
+import com.gadiness.kimaru.ussdhelper.mzigos.PhoneQueue;
+import com.gadiness.kimaru.ussdhelper.mzigos.UssdMessage;
+import com.gadiness.kimaru.ussdhelper.other.WriteToLog;
 
 import java.util.List;
 
@@ -19,15 +23,21 @@ import java.util.List;
 public class UssdService extends AccessibilityService {
     public static String TAG = "LG USSD";
     String nextPhoneNumber;
+    PhoneQueue phoneQueue;
+    WriteToLog writeToLog = new MainActivity().myLog;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event){
         Log.d(TAG, "onAccessibilityEvent");
         String text = event.getText().toString();
         if (event.getClassName().equals("android.app.AlertDialog")){
-            if (text.contains("bundle balance for")){
+            if (text.contains("balance for")){
                 //save the message
-                new MainActivity().saveUssdMessage(text, nextPhoneNumber);
+                saveUssdMessage(text, phoneQueue);
+                writeToLog.log(text);
+                phoneQueue.setStatus(1);
+                new UssdDbHelper(this).updatePhoneQueue(phoneQueue);
+                //update the phone number so that we do not pick it again.
             }
             Log.d(TAG, text);
         }
@@ -40,7 +50,12 @@ public class UssdService extends AccessibilityService {
             if (inputNode != null) { //prepare you text then fill it using ACTION_SET_TEXT
                 Bundle arguments = new Bundle();
                 // set the NextNumber
-                nextPhoneNumber = new MainActivity().getNextNumber();
+                phoneQueue = new UssdDbHelper(this).getNextPhone();
+                nextPhoneNumber = phoneQueue.getPhoneNumber();
+                Log.d(TAG, "-------------------------------------------------");
+                Log.d(TAG, nextPhoneNumber);
+                writeToLog.log("Checking balance (Running USSD) for " +nextPhoneNumber );
+                Log.d(TAG, "-------------------------------------------------");
                 arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, nextPhoneNumber);
                 inputNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
             }
