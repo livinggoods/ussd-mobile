@@ -5,15 +5,16 @@ package com.gadiness.kimaru.ussdhelper.mzigos;
  */
 
 public class PhoneQueue {
-    int id, branchId;
-    String phoneNumber, status, errorMessage, country;
+    int id, branchId, queueId, phoneId, status;
+    String phoneNumber, errorMessage, country, assignedTo, branchName;
     boolean sent, deleted, synced;
+    int color = -1;
 
     public PhoneQueue() {}
 
-    public PhoneQueue(int id, int branchId, String phoneNumber, String status,
+    public PhoneQueue(int id, int branchId, String phoneNumber, int status,
                       String errorMessage, String country, boolean sent, boolean deleted,
-                      boolean synced) {
+                      boolean synced, int queueId, String assignedTo, String branchName, int phoneId) {
         this.id = id;
         this.branchId = branchId;
         this.phoneNumber = phoneNumber;
@@ -23,6 +24,34 @@ public class PhoneQueue {
         this.sent = sent;
         this.deleted = deleted;
         this.synced = synced;
+        this.queueId = queueId;
+        this.assignedTo = assignedTo;
+        this.branchName= branchName;
+        this.phoneId = phoneId;
+    }
+
+    public int getPhoneId() {
+        return phoneId;
+    }
+
+    public void setPhoneId(int phoneId) {
+        this.phoneId = phoneId;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
     public int getId() {
