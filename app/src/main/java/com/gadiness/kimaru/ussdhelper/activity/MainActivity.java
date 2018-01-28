@@ -238,12 +238,12 @@ public class MainActivity extends AppCompatActivity {
                 return homeFragment;
             case 1:
                 // photos
-                PhotosFragment photosFragment = new PhotosFragment();
-                return photosFragment;
+                PhonesFragment phonesFragment = new PhonesFragment();
+                return phonesFragment;
             case 2:
                 // movies fragment
-                MoviesFragment moviesFragment = new MoviesFragment();
-                return moviesFragment;
+                ActionsFragment actionsFragment = new ActionsFragment();
+                return actionsFragment;
             case 3:
                 // notifications fragment
                 NotificationsFragment notificationsFragment = new NotificationsFragment();
@@ -253,6 +253,11 @@ public class MainActivity extends AppCompatActivity {
                 // settings fragment
                 SettingsFragment settingsFragment = new SettingsFragment();
                 return settingsFragment;
+
+            case 6:
+                // settings fragment
+                QueuesFragment queuesFragment = new QueuesFragment();
+                return queuesFragment;
             default:
                 return new HomeFragment();
         }
