@@ -4,17 +4,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.gadiness.kimaru.ussdhelper.R;
 import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
+import com.gadiness.kimaru.ussdhelper.other.AppPreferences;
 import com.gadiness.kimaru.ussdhelper.other.WriteToLog;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,7 +87,29 @@ public class HomeFragment extends Fragment {
         runCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialNumber("*150*1*4*2");
+                // create a task
+                Toast.makeText(getContext(), "Starting the USSD task", Toast.LENGTH_SHORT).show();
+                final Handler handler = new Handler(Looper.getMainLooper());
+                Timer timer = new Timer();
+                TimerTask getPhoneTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                // check if there are any pending numbers to be sent
+                                if (new UssdDbHelper(getContext()).getPhoneQueus().size() > 0){
+                                    android.util.Log.d(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                                    dialNumber(new AppPreferences(getContext()).getUssdCode());
+                                    android.util.Log.d(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                                }
+
+
+                            }
+                        });
+                    }
+                };
+                timer.schedule(getPhoneTask, 0, 60*1000 / 3); //every 20 seconds
             }
         });
         return view;
