@@ -13,17 +13,22 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
+import com.gadiness.kimaru.ussdhelper.mzigos.Queue;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpPost;
 import com.koushikdutta.async.http.body.JSONObjectBody;
