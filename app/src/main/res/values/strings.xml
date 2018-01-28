@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">Ussd Helper</string>
+    <string name="app_name">Qdata</string>
+    <string name="app_url">http://ussd.lg-apps.com</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -8,20 +9,28 @@
 
     <!-- Navigation Drawer menu labels -->
     <string name="nav_home">Home</string>
-    <string name="nav_photos">Photos</string>
-    <string name="nav_movies">Movies</string>
+    <string name="nav_photos">Phones</string>
+    <string name="nav_movies">Actions</string>
     <string name="nav_notifications">Notifications</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_about_us">About Us</string>
+    <string name="nav_queues">Queues</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
     <string-array name="nav_item_activity_titles">
         <item>Home</item>
-        <item>Photos</item>
-        <item>Movies</item>
+        <item>Phones</item>
+        <item>Actions</item>
         <item>Notifications</item>
         <item>Settings</item>
+        <item>About</item>
+        <item>Upstream Queues</item>
     </string-array>
+
+    <string name="action_select">Select All</string>
+    <string name="action_deselect">Deselect</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_submit">Submit</string>
 
     <string name="activity_title_about_us">About Us</string>
     <string name="activity_title_privacy_policy">Privacy Policy</string>
