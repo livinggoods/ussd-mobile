@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadNavHeader() {
         // name, website
-        txtName.setText("Ravi Tamada");
-        txtWebsite.setText("www.androidhive.info");
+        txtName.setText(R.string.app_name);
+        txtWebsite.setText(R.string.app_url);
 
         // loading header background image
         Glide.with(this).load(urlNavHeaderBg)
@@ -165,12 +165,13 @@ public class MainActivity extends AppCompatActivity {
                 .into(imgNavHeaderBg);
 
         // Loading profile image
-        Glide.with(this).load(urlProfileImg)
+        Glide.with(this).load(R.mipmap.lg_bg)
                 .crossFade()
                 .thumbnail(0.5f)
                 .bitmapTransform(new CircleTransform(this))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgProfile);
+
 
         // showing dot next to notifications label
         navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
