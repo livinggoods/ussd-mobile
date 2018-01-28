@@ -9,9 +9,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.icu.text.SimpleDateFormat;
 import android.util.Log;
 
+import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.mzigos.PhoneQueue;
 import com.gadiness.kimaru.ussdhelper.mzigos.Queue;
 import com.gadiness.kimaru.ussdhelper.mzigos.UssdMessage;
+import com.gadiness.kimaru.ussdhelper.other.WriteToLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
