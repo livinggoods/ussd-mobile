@@ -158,13 +158,4 @@ public class HomeFragment extends Fragment {
         String ussdCode = ussd + Uri.encode("#");
         startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + ussdCode)));
     }
-    public String getNextNumber(){
-        String phoneNumber = new UssdDbHelper(getContext()).getNextPhone().getPhoneNumber();
-        if (!phoneNumber.startsWith("0")){
-            phoneNumber = "0"+phoneNumber;
-        }
-        writeToLog.log(phoneNumber);
-        Log.d(TAG, phoneNumber);
-        return phoneNumber;
-    }
 }
