@@ -30,13 +30,18 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.gadiness.kimaru.ussdhelper.R;
 import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
 import com.gadiness.kimaru.ussdhelper.fragment.HomeFragment;
-import com.gadiness.kimaru.ussdhelper.fragment.MoviesFragment;
+import com.gadiness.kimaru.ussdhelper.fragment.ActionsFragment;
 import com.gadiness.kimaru.ussdhelper.fragment.NotificationsFragment;
-import com.gadiness.kimaru.ussdhelper.fragment.PhotosFragment;
+import com.gadiness.kimaru.ussdhelper.fragment.PhonesFragment;
+import com.gadiness.kimaru.ussdhelper.fragment.QueuesFragment;
 import com.gadiness.kimaru.ussdhelper.fragment.SettingsFragment;
+import com.gadiness.kimaru.ussdhelper.mzigos.PhoneQueue;
 import com.gadiness.kimaru.ussdhelper.mzigos.UssdMessage;
 import com.gadiness.kimaru.ussdhelper.other.CircleTransform;
 import com.gadiness.kimaru.ussdhelper.other.WriteToLog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "USSDAPP";
     public WriteToLog myLog = new WriteToLog();
+
+    public UssdDbHelper ussdDbHelperDatabase;
+    List<String> phoneQueueList = new ArrayList<>();
+
 
     // urls to load navigation header background image
     // and profile image
@@ -65,10 +74,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG_MOVIES = "movies";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
+    private static final String TAG_QUEUES = "queues";
     public static String CURRENT_TAG = TAG_HOME;
 
     // toolbar titles respected to selected nav menu item
     private String[] activityTitles;
+    public static Fragment backFragment = null;
 
     // flag to load home fragment when user presses back key
     private boolean shouldLoadHomeFragOnBackPress = true;
@@ -81,6 +92,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ussdDbHelperDatabase = new UssdDbHelper(this);
+
+
+        UssdDbHelper ussdDbHelperDb = new UssdDbHelper(getApplicationContext());
+
+
+
+        for (PhoneQueue phone:ussdDbHelperDb.getPhoneQueus()){
+            phoneQueueList.add(phone.getPhoneNumber());
+        }
+
+        //Test the phone numbers.
+        for (String x : phoneQueueList){
+            Log.d(TAG, "=======================================================");
+            Log.d(TAG, x);
+            Log.d(TAG, "=======================================================");
+        }
 
         mHandler = new Handler();
 
