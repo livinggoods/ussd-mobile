@@ -124,7 +124,7 @@ public class ActionsFragment extends Fragment {
                         });
                     }
                 };
-                timer.schedule(getPhoneTask, 0, 60*1000 / 3); //every 20 seconds
+                timer.schedule(getPhoneTask, 0, 60*1000 / 3);
             }
         });
 
