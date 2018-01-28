@@ -41,7 +41,6 @@ public class UssdDbHelper extends SQLiteOpenHelper{
 
     Context context;
 
-
     public static String varchar_field = " varchar(512) ";
     public static String real_field = " REAL ";
     public static String primary_field = " INTEGER PRIMARY KEY AUTOINCREMENT ";
@@ -428,7 +427,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     }
 
 
-    public void phoneFromJson(JSONObject jsonObject){
+    public Long phoneFromJson(JSONObject jsonObject){
         Log.d("APISYNCHELPER", "phoneFromJson");
         try{
             PhoneQueue phone=new PhoneQueue();
@@ -444,11 +443,17 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             phone.setQueueId(jsonObject.getInt(QUEUE_ID));
             phone.setAssignedTo(jsonObject.getString(ASSIGNED_TO));
             phone.setSynced(jsonObject.getBoolean(SYNCED));
-            this.addPhoneQueue(phone);
-            Log.d("APISYNCHELPER", "phoneFromJson - Added");
+            Long saved = this.addPhoneQueue(phone);
+            if(saved > 0){
+                Log.d("APISYNCHELPER", "phoneFromJson - Added");
+                return Long.valueOf(phone.getId());
+            }else{
+                return null;
+            }
         }catch (Exception e){
             Log.d("APISYNCHELPER", "ERROR "+ e.getMessage());
         }
+        return null;
     }
 
     public PhoneQueue getPhoneById(int id){
