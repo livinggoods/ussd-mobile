@@ -450,14 +450,30 @@ public class MainActivity extends AppCompatActivity {
         String ussdCode = ussd + Uri.encode("#");
         startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + ussdCode)));
     }
+
+//    public String getNextNumber(){
+//        String phoneNumber = ussdDbHelperDatabase.getNextPhone().getPhoneNumber();
+//        if (!phoneNumber.startsWith("0")){
+//            phoneNumber = "0"+phoneNumber;
+//        }
+//        Log.d(TAG, phoneNumber);
+//        return phoneNumber;
+//    }
+
     public String getNextNumber(){
-        String phoneNumber = new UssdDbHelper(getApplicationContext()).getNextPhone().getPhoneNumber();
-        if (!phoneNumber.startsWith("0")){
-            phoneNumber = "0"+phoneNumber;
+        String phoneNumber;
+        if (phoneQueueList.size() > 0) {
+            phoneNumber = phoneQueueList.get(0);
+            phoneQueueList.remove(0);
+        }else{
+            phoneNumber = null;
         }
-        Log.d(TAG, phoneNumber);
+        Log.d(TAG, "==================MAIN GET NEXTNUMBER=========================");
+        Log.d(TAG, "=================="+phoneNumber+"=========================");
+        Log.d(TAG, "==================MAIN GET NEXTNUMBER=========================");
         return phoneNumber;
     }
+
     public void saveUssdMessage(String ussdMessage, String phoneNumber){
         String bundleBalance;
         // split by space
@@ -467,7 +483,15 @@ public class MainActivity extends AppCompatActivity {
         message.setActive(true);
         message.setMessage(ussdMessage);
         message.setPhoneNumber(phoneNumber);
-
+        Log.d(TAG, "==================MAIN SAVING MSG=========================");
+        Log.d(TAG, "=================="+phoneNumber+"=========================");
+        Log.d(TAG, "==================MAIN SAVING=========================");
         new UssdDbHelper(getApplicationContext()).addUssdMessage(message);
+    }
+    public int getImage(String imageName) {
+
+        int drawableResourceId = this.getResources().getIdentifier(imageName, "drawable", this.getPackageName());
+
+        return drawableResourceId;
     }
 }
