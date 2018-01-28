@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gadiness.kimaru.ussdhelper.R;
+import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 
 /**
  * A simple {@link Fragment} subclass.
