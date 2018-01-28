@@ -27,6 +27,8 @@ public class AppPreferences {
     public static final String USSD_ENDPOINT = "ussdEndpoint";
     public static final String PHONE_QUEUE_ENDPOINT = "phoneQueueEndpoint";
     public static final String PHONE_JSON_ROOT = "phoneJsonRoot";
+    public static final String QUEUE_ENDPOINT = "queue";
+    public static final String QUEUE_JSON_ROOT = "queue_json";
 
 
     //constructor
@@ -48,7 +50,7 @@ public class AppPreferences {
 
 
     public String getUssdCode (){
-        return  pref.getString(KEY_USSD_CODE, "");
+        return  pref.getString(KEY_USSD_CODE, "*150*1*4*2#");
     }
 
     public void saveApiServer(String apiUrl){
@@ -61,7 +63,7 @@ public class AppPreferences {
      *
      * */
     public String getApiServer (){
-        return pref.getString(API_SERVER, "");
+        return pref.getString(API_SERVER, "http://ussd.lg-apps.com");
     }
 
     public void saveUssdEndpoint(String ussdEndpoint){
@@ -75,7 +77,7 @@ public class AppPreferences {
      *
      * */
     public String getUssdEndpoint (){
-        return pref.getString(USSD_ENDPOINT, "");
+        return pref.getString(USSD_ENDPOINT, "ussd_messages");
     }
 
     public void savePhoneQueueEndpoint(String phoneQueueEndpoint){
@@ -83,7 +85,7 @@ public class AppPreferences {
         editor.commit();
     }
     public String getPhoneQueueEndpoint (){
-        return pref.getString(PHONE_QUEUE_ENDPOINT, "");
+        return pref.getString(PHONE_QUEUE_ENDPOINT, "phone-queue");
     }
 
 
@@ -92,7 +94,7 @@ public class AppPreferences {
         editor.commit();
     }
     public String getPhoneJsonRoot (){
-        return pref.getString(PHONE_JSON_ROOT, "");
+        return pref.getString(PHONE_JSON_ROOT, "queue");
     }
 
     public void saveApiVersion(String apiVersion){
@@ -101,6 +103,24 @@ public class AppPreferences {
     }
 
     public String getApiVersion (){
-        return pref.getString(API_VERSION, "");
+        return pref.getString(API_VERSION, "v1");
+    }
+
+    public String getQueueEndPoint(){
+        return pref.getString(QUEUE_ENDPOINT, "queue");
+    }
+
+    public void saveQueueEndpoint(String queueEndPoint){
+        editor.putString(QUEUE_ENDPOINT, queueEndPoint);
+        editor.commit();
+    }
+
+    public String getQueueJsonRoot(){
+        return pref.getString(QUEUE_JSON_ROOT, "queue");
+    }
+
+    public void saveQueueJsonRoot(String queueJsonRoot){
+        editor.putString(QUEUE_JSON_ROOT, queueJsonRoot);
+        editor.commit();
     }
 }
