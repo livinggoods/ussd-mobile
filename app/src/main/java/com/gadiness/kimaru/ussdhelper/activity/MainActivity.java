@@ -367,20 +367,28 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // This code loads home fragment when back key is pressed
-        // when user is in other fragment than home
-        if (shouldLoadHomeFragOnBackPress) {
-            // checking if user is on other navigation menu
-            // rather than home
-            if (navItemIndex != 0) {
-                navItemIndex = 0;
-                CURRENT_TAG = TAG_HOME;
-                loadHomeFragment();
-                return;
-            }
-        }
+        Runnable mPendingRunnable;
+        if (backFragment != null){
+            mPendingRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    // update the main content by replacing fragments
+                    Fragment fragment = backFragment;
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
+                            android.R.anim.fade_out);
+                    fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
+                    fragmentTransaction.commitAllowingStateLoss();
+                }
+            };
 
-        super.onBackPressed();
+            // If mPendingRunnable is not null, then add to the message queue
+            if (mPendingRunnable != null) {
+                mHandler.post(mPendingRunnable);
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -396,6 +404,7 @@ public class MainActivity extends AppCompatActivity {
         if (navItemIndex == 3) {
             getMenuInflater().inflate(R.menu.notifications, menu);
         }
+
         return true;
     }
 
