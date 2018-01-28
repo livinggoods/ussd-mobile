@@ -644,12 +644,12 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         Log.d("APISYNCHELPER", "+++++++++++++++++++++++++++++++++++++++++++++");
         try{
             Queue queue=new Queue();
-            queue.setBranchName(jsonObject.getString(BRANCH_NAME));
             queue.setName(jsonObject.getString(NAME));
             queue.setStatus(jsonObject.getString(STATUS));
             queue.setCountry(jsonObject.getString(COUNTRY));
             queue.setId(jsonObject.getInt(ID));
-            queue.setBranchId(jsonObject.getString(BRANCH_ID)==null ? 0: jsonObject.getInt(BRANCH_ID));
+            queue.setBranchName(jsonObject.isNull(BRANCH_NAME) ? null: jsonObject.getString(BRANCH_NAME));
+            queue.setBranchId(jsonObject.isNull(BRANCH_ID) ? 0: jsonObject.getInt(BRANCH_ID));
             queue.setDeleted(jsonObject.getBoolean(DELETED));
             queue.setCompleted(false);
             queue.setDateAdded(jsonObject.getLong(DATE_ADDED));
