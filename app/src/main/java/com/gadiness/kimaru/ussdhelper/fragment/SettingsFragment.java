@@ -212,7 +212,7 @@ public class SettingsFragment extends Fragment {
                 builder.setTitle("Phone Endpoint");
                 final EditText phoneEndpoint = new EditText(getContext());
                 phoneEndpoint.setHint("Phone endpoint");
-                phoneEndpoint.setText(appPreferences.getUssdEndpoint());
+                phoneEndpoint.setText(appPreferences.getPhoneQueueEndpoint());
                 LinearLayout ussdEndpointLayout = new LinearLayout(getContext());
                 ussdEndpointLayout.setOrientation(LinearLayout.VERTICAL);
                 ussdEndpointLayout.addView(phoneEndpoint);
