@@ -302,6 +302,11 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 4;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
+
+                    case R.id.nav_queues:
+                        navItemIndex = 6;
+                        CURRENT_TAG = TAG_QUEUES;
+                        break;
                     case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
@@ -325,6 +330,8 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setChecked(true);
 
                 loadHomeFragment();
+
+
 
                 return true;
             }
