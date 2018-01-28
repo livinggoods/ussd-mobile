@@ -83,4 +83,24 @@ public class UssdService extends AccessibilityService {
         setServiceInfo(info);
     }
 
+    public void saveUssdMessage(String ussdMessage, PhoneQueue phoneQueue){
+        String bundleBalance;
+        // split by space
+        UssdMessage message = new UssdMessage();
+        message.setSynced(false);
+        message.setDeleted(false);
+        message.setActive(true);
+        message.setMessage(ussdMessage);
+        message.setPhoneNumber(phoneQueue.getPhoneNumber());
+        message.setQueueId(phoneQueue.getQueueId());
+        message.setPhoneId(phoneQueue.getPhoneId());
+        Log.d("PHONEQUEUE", "===============/////////////////////============");
+        Log.d("PHONEQUEUE", String.valueOf(phoneQueue.getQueueId())+" "+ phoneQueue.getPhoneNumber());
+        Log.d("PHONEQUEUE", "===============/////////////////////============");
+        UssdDbHelper ussdDbHelper = new UssdDbHelper(this);
+        ussdDbHelper.addUssdMessage(message);
+        ussdDbHelper.deletePhoneQueue(phoneQueue);
+
+    }
+
 }
