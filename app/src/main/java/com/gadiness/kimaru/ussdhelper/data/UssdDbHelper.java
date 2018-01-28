@@ -255,7 +255,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         }
     }
 
-    public void ussdMessageFromJson(JSONObject jsonObject){
+    public void createUssdMessageFromJson(JSONObject jsonObject){
         try{
             UssdMessage message=new UssdMessage();
             message.setId(jsonObject.getInt(ID));
@@ -275,6 +275,30 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         }catch (Exception e){}
     }
 
+    public UssdMessage ussdMessageFromJson(JSONObject jsonObject){
+        try{
+            UssdMessage message=new UssdMessage();
+            message.setId(jsonObject.getInt(ID));
+            message.setMessage(jsonObject.getString(MESSAGE));
+            message.setPhoneNumber(jsonObject.getString(PHONE_NUMBER));
+            message.setBranchId(jsonObject.getInt(BRANCH_ID));
+            message.setPhoneId(jsonObject.getInt(PHONE_ID));
+            message.setBundleBalance(jsonObject.getInt(BUNDLE_BALANCE));
+            message.setExpiryDateTime(jsonObject.getLong(EXPIRY_DATETIME));
+            message.setMessageTypeId(jsonObject.getInt(MESSAGE_TYPE_ID));
+            message.setCountry(jsonObject.getString(COUNTRY));
+            message.setDateAdded(jsonObject.getLong(DATE_ADDED));
+            message.setActive(jsonObject.getInt(ACTIVE)==1);
+            message.setDeleted(jsonObject.getInt(DELETED)==1);
+            message.setSynced(jsonObject.getInt(SYNCED)==1);
+            return message;
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+
+
     public JSONObject getMessagesToSyncJson() {
         SQLiteDatabase db=getReadableDatabase();
         String whereClause = SYNCED+" = ?";
@@ -293,14 +317,18 @@ public class UssdDbHelper extends SQLiteOpenHelper{
 
         cv.put(ID, phone.getId());
         cv.put(BRANCH_ID, phone.getBranchId());
+        cv.put(BRANCH_NAME, phone.getBranchName());
         cv.put(PHONE_NUMBER, phone.getPhoneNumber());
+        cv.put(PHONE_ID, phone.getPhoneId());
         cv.put(STATUS, phone.getStatus());
         cv.put(ERROR_MESSAGE, phone.getErrorMessage());
         cv.put(COUNTRY, phone.getCountry());
         cv.put(SENT, phone.isSent());
         cv.put(DELETED, phone.isDeleted());
+        cv.put(QUEUE_ID, phone.getQueueId());
         cv.put(SYNCED, phone.isSynced());
-
+        cv.put(QUEUE_ID, phone.getQueueId());
+        cv.put(ASSIGNED_TO, phone.getAssignedTo());
         long id;
         if (isExistPhone(phone)){
             id = db.update(PHONE_QUEUE_TABLE_NAME, cv, ID+"='"+phone.getId()+"'", null);
@@ -311,40 +339,114 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         return id;
     }
 
+    public long updatePhoneQueue(PhoneQueue phone) {
+
+        SQLiteDatabase db=getWritableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(ID, phone.getId());
+        cv.put(BRANCH_ID, phone.getBranchId());
+        cv.put(BRANCH_NAME, phone.getBranchName());
+        cv.put(PHONE_NUMBER, phone.getPhoneNumber());
+        cv.put(PHONE_ID, phone.getPhoneId());
+        cv.put(STATUS, phone.getStatus());
+        cv.put(ERROR_MESSAGE, phone.getErrorMessage());
+        cv.put(COUNTRY, phone.getCountry());
+        cv.put(SENT, phone.isSent());
+        cv.put(DELETED, phone.isDeleted());
+        cv.put(QUEUE_ID, phone.getQueueId());
+        cv.put(SYNCED, phone.isSynced());
+        cv.put(QUEUE_ID, phone.getQueueId());
+        cv.put(ASSIGNED_TO, phone.getAssignedTo());
+        long id =  db.update(PHONE_QUEUE_TABLE_NAME, cv, ID+"='"+phone.getId()+"'", null);
+        db.close();
+        return id;
+    }
+
     public List<PhoneQueue> getPhoneQueus(){
+        // Only select phones where status is 0
         SQLiteDatabase db=getReadableDatabase();
-        Cursor cursor=db.query(PHONE_QUEUE_TABLE_NAME,phoneQueueColumns,null,null,null,null,null,null);
+        String whereClause = STATUS+" = ?";
+        String[] whereArgs = new String[] {
+                String.valueOf(0),
+        };
+        Cursor cursor=db.query(PHONE_QUEUE_TABLE_NAME,phoneQueueColumns,whereClause,whereArgs,null,null,null,null);
+
         List<PhoneQueue> phoneQueues=new ArrayList<>();
         for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
             PhoneQueue phoneQueue = new PhoneQueue();
             phoneQueue.setId(cursor.getInt(cursor.getColumnIndex(ID)));
             phoneQueue.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+            phoneQueue.setBranchName(cursor.getString(cursor.getColumnIndex(BRANCH_NAME)));
             phoneQueue.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
-            phoneQueue.setStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+            phoneQueue.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
+            phoneQueue.setStatus(cursor.getInt(cursor.getColumnIndex(STATUS)));
             phoneQueue.setErrorMessage(cursor.getString(cursor.getColumnIndex(ERROR_MESSAGE)));
             phoneQueue.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
             phoneQueue.setSent(cursor.getInt(cursor.getColumnIndex(SENT))==1);
             phoneQueue.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+            phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
+            phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
+            phoneQueues.add(phoneQueue);
+        }
+        return phoneQueues;
+    }
+
+
+    public List<PhoneQueue> getPhoneQueueByQueueId(int queueId){
+        // Only select phones where status is 0
+        SQLiteDatabase db=getReadableDatabase();
+        String whereClause = STATUS+" = ? AND "+QUEUE_ID+" = ?";
+        String[] whereArgs = new String[] {
+                String.valueOf(0),
+                String.valueOf(queueId)
+        };
+        Cursor cursor=db.query(PHONE_QUEUE_TABLE_NAME,phoneQueueColumns,whereClause,whereArgs,null,null,null,null);
+
+        List<PhoneQueue> phoneQueues=new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
+            PhoneQueue phoneQueue = new PhoneQueue();
+            phoneQueue.setId(cursor.getInt(cursor.getColumnIndex(ID)));
+            phoneQueue.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+            phoneQueue.setBranchName(cursor.getString(cursor.getColumnIndex(BRANCH_NAME)));
+            phoneQueue.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
+            phoneQueue.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
+            phoneQueue.setStatus(cursor.getInt(cursor.getColumnIndex(STATUS)));
+            phoneQueue.setErrorMessage(cursor.getString(cursor.getColumnIndex(ERROR_MESSAGE)));
+            phoneQueue.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
+            phoneQueue.setSent(cursor.getInt(cursor.getColumnIndex(SENT))==1);
+            phoneQueue.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+            phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
+            phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
+            phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
+            phoneQueues.add(phoneQueue);
         }
         return phoneQueues;
     }
 
 
     public void phoneFromJson(JSONObject jsonObject){
+        Log.d("APISYNCHELPER", "phoneFromJson");
         try{
             PhoneQueue phone=new PhoneQueue();
             phone.setId(jsonObject.getInt(ID));
             phone.setBranchId(jsonObject.getInt(BRANCH_ID));
+            phone.setBranchName(jsonObject.getString(BRANCH_NAME));
             phone.setPhoneNumber(jsonObject.getString(PHONE_NUMBER));
-            phone.setStatus(jsonObject.getString(STATUS));
+            phone.setPhoneId(jsonObject.getInt(PHONE_ID));
             phone.setErrorMessage(jsonObject.getString(ERROR_MESSAGE));
             phone.setCountry(jsonObject.getString(COUNTRY));
             phone.setSent(jsonObject.getBoolean(SENT));
             phone.setDeleted(jsonObject.getBoolean(DELETED));
+            phone.setQueueId(jsonObject.getInt(QUEUE_ID));
+            phone.setAssignedTo(jsonObject.getString(ASSIGNED_TO));
             phone.setSynced(jsonObject.getBoolean(SYNCED));
             this.addPhoneQueue(phone);
-        }catch (Exception e){}
+            Log.d("APISYNCHELPER", "phoneFromJson - Added");
+        }catch (Exception e){
+            Log.d("APISYNCHELPER", "ERROR "+ e.getMessage());
+        }
     }
 
     public PhoneQueue getPhoneById(int id){
@@ -361,12 +463,16 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             PhoneQueue phoneQueue = new PhoneQueue();
             phoneQueue.setId(cursor.getInt(cursor.getColumnIndex(ID)));
             phoneQueue.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+            phoneQueue.setBranchName(cursor.getString(cursor.getColumnIndex(BRANCH_NAME)));
             phoneQueue.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
-            phoneQueue.setStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+            phoneQueue.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
+            phoneQueue.setStatus(cursor.getInt(cursor.getColumnIndex(STATUS)));
             phoneQueue.setErrorMessage(cursor.getString(cursor.getColumnIndex(ERROR_MESSAGE)));
             phoneQueue.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
             phoneQueue.setSent(cursor.getInt(cursor.getColumnIndex(SENT))==1);
             phoneQueue.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+            phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
+            phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
             return phoneQueue;
         }
@@ -374,9 +480,10 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     }
 
     public PhoneQueue getNextPhone(){
+        // Only select phones where status is 0
         SQLiteDatabase db = getReadableDatabase();
 
-        String whereClause = SYNCED+" = ?";
+        String whereClause = STATUS+" = ?";
         String[] whereArgs = new String[] {
                 String.valueOf(0),
         };
@@ -388,12 +495,16 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             PhoneQueue phoneQueue = new PhoneQueue();
             phoneQueue.setId(cursor.getInt(cursor.getColumnIndex(ID)));
             phoneQueue.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+            phoneQueue.setBranchName(cursor.getString(cursor.getColumnIndex(BRANCH_NAME)));
             phoneQueue.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
-            phoneQueue.setStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+            phoneQueue.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
+            phoneQueue.setStatus(cursor.getInt(cursor.getColumnIndex(STATUS)));
             phoneQueue.setErrorMessage(cursor.getString(cursor.getColumnIndex(ERROR_MESSAGE)));
             phoneQueue.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
             phoneQueue.setSent(cursor.getInt(cursor.getColumnIndex(SENT))==1);
             phoneQueue.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+            phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
+            phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
             return phoneQueue;
         }
@@ -447,6 +558,173 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         return results;
     }
 
+
+    //UPSTREAM QUEUE
+
+    /**
+     *
+     * @param queue
+     * @return
+     */
+    public long addUpstreamQueue(Queue queue) {
+
+        SQLiteDatabase db=getWritableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(BRANCH_NAME, queue.getBranchName());
+        cv.put(NAME, queue.getName());
+        cv.put(STATUS, queue.getStatus());
+        cv.put(COUNTRY, queue.getCountry());
+        cv.put(ID, queue.getId());
+        cv.put(BRANCH_ID, queue.getBranchId());
+        cv.put(DELETED, queue.isDeleted());
+        cv.put(COMPLETED, queue.isCompleted());
+        cv.put(DATE_ADDED, queue.getDateAdded());
+
+        long id;
+        if (queueExists(queue)){
+            id = db.update(UPSTREAM_QUEUE_TABLE, cv, ID+"='"+queue.getId()+"'", null);
+            Log.d("USSDHELPER", "Upadted Upstream Queue with id "+cv.get("id"));
+        }else{
+            id = db.insertWithOnConflict(UPSTREAM_QUEUE_TABLE, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
+            Log.d("USSDHELPER", "Created Upstream Queue with id "+cv.get("id"));
+        }
+        Log.d("DBCREATED", "+++++++++++++++++++++++++++++++++++++++++++++");
+        Log.d("DBCREATED", "Record created with "+String.valueOf(queue.getId()));
+        Log.d("DBCREATED", "+++++++++++++++++++++++++++++++++++++++++++++");
+        db.close();
+        return id;
+    }
+
+    public boolean queueExists(Queue queue) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cur = db.rawQuery("SELECT id FROM " + UPSTREAM_QUEUE_TABLE + " WHERE "+ID+" = '" + queue.getId() + "'", null);
+        boolean exist = (cur.getCount() > 0);
+        cur.close();
+        return exist;
+
+    }
+
+    /**
+     * Helper to convert cursor to Queue Object
+     * @param cursor : Cursor obj
+     */
+    private Queue cursorToQueue(Cursor cursor){
+        Queue queue = new Queue();
+        queue.setBranchName(cursor.getString(cursor.getColumnIndex(BRANCH_NAME)));
+        queue.setName(cursor.getString(cursor.getColumnIndex(NAME)));
+        queue.setStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+        queue.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
+        queue.setId(cursor.getInt(cursor.getColumnIndex(ID)));
+        queue.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+        queue.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+        queue.setCompleted(cursor.getInt(cursor.getColumnIndex(COMPLETED))==1);
+        queue.setDateAdded(cursor.getLong(cursor.getColumnIndex(DATE_ADDED)));
+        queue.setSelected(cursor.getInt(cursor.getColumnIndex(SELECTED))==1);
+        return queue;
+    }
+    //getting the queue
+    public List<Queue> getQueus(){
+        SQLiteDatabase db=getReadableDatabase();
+        String whereClause = STATUS+" != ?";
+        String orderBy = ID + " desc";
+        String[] whereArgs = new String[] {
+                "synced",
+        };
+        Cursor cursor=db.query(UPSTREAM_QUEUE_TABLE,upstreamQueueCols,whereClause,whereArgs,null,null,orderBy, null);
+        List<Queue> queues=new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
+            queues.add(cursorToQueue(cursor));
+        }
+        return queues;
+    }
+
+    public void queueFromJson(JSONObject jsonObject){
+        Log.d("APISYNCHELPER", "+++++++++++++++++++++++++++++++++++++++++++++");
+        Log.d("APISYNCHELPER", "queueFromJson()");
+        Log.d("APISYNCHELPER", "+++++++++++++++++++++++++++++++++++++++++++++");
+        try{
+            Queue queue=new Queue();
+            queue.setBranchName(jsonObject.getString(BRANCH_NAME));
+            queue.setName(jsonObject.getString(NAME));
+            queue.setStatus(jsonObject.getString(STATUS));
+            queue.setCountry(jsonObject.getString(COUNTRY));
+            queue.setId(jsonObject.getInt(ID));
+            queue.setBranchId(jsonObject.getString(BRANCH_ID)==null ? 0: jsonObject.getInt(BRANCH_ID));
+            queue.setDeleted(jsonObject.getBoolean(DELETED));
+            queue.setCompleted(false);
+            queue.setDateAdded(jsonObject.getLong(DATE_ADDED));
+            this.addUpstreamQueue(queue);
+        }catch (Exception e){
+            Log.d("APISYNCHELPER", "ERROR "+ e.getMessage());
+        }
+    }
+
+    public long deleteQueue(Queue queue) {
+        SQLiteDatabase db = getReadableDatabase();
+        String whereClause = ID+" = ?";
+        String[] whereArgs = new String[] {
+                String.valueOf(queue.getId()),
+        };
+        int status=db.delete(UPSTREAM_QUEUE_TABLE,whereClause,whereArgs);
+        return status;
+    }
+
+    public long markAsSelected(Queue queue) {
+        SQLiteDatabase db=getWritableDatabase();
+        ContentValues cv=new ContentValues();
+        cv.put(BRANCH_NAME, queue.getBranchName());
+        cv.put(NAME, queue.getName());
+        cv.put(STATUS, queue.getStatus());
+        cv.put(COUNTRY, queue.getCountry());
+        cv.put(ID, queue.getId());
+        cv.put(BRANCH_ID, queue.getBranchId());
+        cv.put(DELETED, queue.isDeleted());
+        cv.put(COMPLETED, queue.isCompleted());
+        cv.put(DATE_ADDED, queue.getDateAdded());
+        cv.put(SELECTED, 1);
+
+        long id = db.update(UPSTREAM_QUEUE_TABLE, cv, ID+"='"+queue.getId()+"'", null);
+        db.close();
+        return id;
+    }
+
+    public List<Queue> getSelectedQueues(){
+        SQLiteDatabase db=getReadableDatabase();
+        String whereClause = SELECTED+" = ?";
+        String[] whereArgs = new String[] {
+                "1",
+        };
+        Cursor cursor=db.query(UPSTREAM_QUEUE_TABLE,upstreamQueueCols,whereClause,whereArgs,null,null,null, null);
+        List<Queue> queues=new ArrayList<>();
+        for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
+            queues.add(cursorToQueue(cursor));
+        }
+        return queues;
+    }
+
+    public JSONObject getSelectedQueuesAsJson(){
+        SQLiteDatabase db=getReadableDatabase();
+        String whereClause = SELECTED+" = ?";
+        String[] whereArgs = new String[] {
+                "1",
+        };
+        Cursor cursor=db.query(UPSTREAM_QUEUE_TABLE,upstreamQueueCols,whereClause,whereArgs,null,null,null, null);
+        return cursorToJson(cursor, UPSTREAM_QUEUE_JSON_ROOT);
+    }
+
+
+    private boolean isTableExists(String tableName){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '"+tableName+"'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
 
     private void upgradeVersion2(SQLiteDatabase db) {}
 
