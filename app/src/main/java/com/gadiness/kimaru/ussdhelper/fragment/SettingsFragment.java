@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gadiness.kimaru.ussdhelper.R;
+import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.other.AppPreferences;
 
 /**
@@ -77,6 +78,7 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        MainActivity.backFragment = new HomeFragment();
         appPreferences = new AppPreferences(getContext());
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         appUrl = (TextView) view.findViewById(R.id.appUrl);
