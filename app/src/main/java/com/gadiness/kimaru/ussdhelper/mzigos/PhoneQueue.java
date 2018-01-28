@@ -125,4 +125,20 @@ public class PhoneQueue {
     public void setSynced(boolean synced) {
         this.synced = synced;
     }
+
+    public int getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(int queueId) {
+        this.queueId = queueId;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 }
