@@ -287,7 +287,7 @@ public class SettingsFragment extends Fragment {
                         String version = phoneApiV.getText().toString();
                         if (!version.trim().equals("")){
                             appPreferences.saveApiVersion(version);
-                            baseApiVersion.setText(appPreferences.getPhoneJsonRoot());
+                            baseApiVersion.setText(appPreferences.getApiVersion());
                         }
                     }
                 });
