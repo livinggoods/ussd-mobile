@@ -198,15 +198,9 @@ public class ApiSyncHelper {
     private String postJsonToUrl(JSONObject json, String JsonRoot, String url) throws Exception {
         //  get the server URL
         AsyncHttpPost p = new AsyncHttpPost(url);
-        android.util.Log.d("USSD", "postToUrl");
-        android.util.Log.d("USSD", json.toString());
-        android.util.Log.d("USSD", url);
         p.setBody(new JSONObjectBody(json));
         JSONObject ret;
         ret = AsyncHttpClient.getDefaultInstance().executeJSONObject(p, null).get();
-        android.util.Log.d("USSD","===============+RESULTS++++++++++++++++");
-        android.util.Log.d("USSD", ret.toString());
-        android.util.Log.d("USSD","===============+RESULTS++++++++++++++++");
         return ret.getString(JsonRoot);
     }
 
@@ -214,9 +208,9 @@ public class ApiSyncHelper {
         protected String doInBackground(String... strings){
             String stream = null;
             String urlString = strings[0];
-            android.util.Log.d("PHONE", "+++++++++++++++++++++++++++++++++++++++++");
-            android.util.Log.d("PHONE", urlString);
-            android.util.Log.d("PHONE", "}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+            JSONArray savedNumbers = new JSONArray();
+            JSONObject apiData = new JSONObject();
+            Long id;
             stream = getUrlData(urlString);
             if (stream != null){
                 try{
@@ -227,7 +221,27 @@ public class ApiSyncHelper {
                     for (int x = 0; x < recs.length(); x++){
                         Log.log(TAG + " getPhoneQueueFromApi() - Creating a phone queue record");
                         android.util.Log.d(TAG, " getPhoneQueueFromApi() - Creating a phone queue record");
-                        new UssdDbHelper(context).phoneFromJson(recs.getJSONObject(x));
+                        id = new UssdDbHelper(context).phoneFromJson(recs.getJSONObject(x));
+                        if(id != null){
+                            JSONObject saved = new JSONObject();
+                            saved.put("id", id);
+                            savedNumbers.put(saved);
+                        }
+                    }
+                    //now that I have the items, let me post them back
+                    try{
+                        apiData.put("phones", savedNumbers);
+                        ///
+                        AppPreferences appPreferences = new AppPreferences(context);
+                        StringBuilder ackUrl = new StringBuilder();
+                        ackUrl.append(appPreferences.getApiServer());
+                        ackUrl.append("/api/");
+                        ackUrl.append(appPreferences.getApiVersion());
+                        ackUrl.append("/");
+                        ackUrl.append("phone-queue/received");
+                        postJsonToUrl(apiData, "status", ackUrl.toString());
+                    }catch (Exception e){
+                        //resend this later
                     }
                 } catch (JSONException e){
                     Log.log(TAG + " ERROR getPhoneQueueFromApi() - "+ e.getMessage());
