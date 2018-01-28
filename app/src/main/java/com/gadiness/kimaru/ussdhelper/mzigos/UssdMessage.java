@@ -5,7 +5,7 @@ package com.gadiness.kimaru.ussdhelper.mzigos;
  */
 
 public class UssdMessage {
-    int id, messageTypeId, branchId, phoneId;
+    int id, messageTypeId, branchId, phoneId, queueId;
     String phoneNumber, message, country;
     double bundleBalance;
     Long expiryDateTime, dateAdded;
@@ -16,7 +16,7 @@ public class UssdMessage {
     public UssdMessage(int id, int messageTypeId, String phoneNumber, String message,
                        int branchId, int phoneId, String country, double bundleBalance,
                        Long expiryDateTime, Long dateAdded, boolean active, boolean deleted,
-                       boolean synced) {
+                       boolean synced, int queueId) {
         this.id = id;
         this.messageTypeId = messageTypeId;
         this.phoneNumber = phoneNumber;
@@ -30,6 +30,15 @@ public class UssdMessage {
         this.active = active;
         this.deleted = deleted;
         this.synced = synced;
+        this.queueId = queueId;
+    }
+
+    public int getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(int queueId) {
+        this.queueId = queueId;
     }
 
     public int getId() {
