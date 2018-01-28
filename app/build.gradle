@@ -12,7 +12,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId "com.expansion.lg.kimaru.expansion"
+        applicationId "com.gadiness.kimaru.ussdhelper"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1
