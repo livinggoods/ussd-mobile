@@ -22,6 +22,7 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -353,7 +354,6 @@ public class ApiSyncHelper {
                     Log.log(TAG + " getQueuesFromApi() - Starting to create a queues record");
                     JSONArray recs = reader.getJSONArray(new AppPreferences(context).getQueueJsonRoot());
                     for (int x = 0; x < recs.length(); x++){
-                        Log.log(TAG + " getQueuesFromApi() - Creating a queue record");
                         android.util.Log.d(TAG, " getQueuesFromApi() - Creating a phone queue record");
                         new UssdDbHelper(context).queueFromJson(recs.getJSONObject(x));
                     }
