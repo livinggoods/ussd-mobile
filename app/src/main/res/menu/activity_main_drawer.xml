@@ -16,6 +16,11 @@
             android:title="@string/nav_movies" />
 
         <item
+            android:id="@+id/nav_queues"
+            android:icon="@drawable/ic_notifications_black_24dp"
+            android:title="@string/nav_queues" />
+
+        <item
             android:id="@+id/nav_notifications"
             android:icon="@drawable/ic_notifications_black_24dp"
             android:title="@string/nav_notifications" />
