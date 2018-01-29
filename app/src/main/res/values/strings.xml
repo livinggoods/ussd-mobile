@@ -27,7 +27,7 @@
         <item>Upstream Queues</item>
     </string-array>
 
-    <string name="action_select">Select All</string>
+    <string name="action_select">Select</string>
     <string name="action_deselect">Deselect</string>
     <string name="action_delete">Delete</string>
     <string name="action_submit">Submit</string>

@@ -44,26 +44,29 @@ public class UssdService extends AccessibilityService {
         Log.d(TAG, "Setting the Input");
         AccessibilityNodeInfo source = event.getSource();
         if (source != null) {
-            Log.d(TAG, "SOURCE IS FOUND");
-            //capture the EditText simply by using FOCUS_INPUT (since the EditText has the focus), you can probably find it with the viewId input_field
-            AccessibilityNodeInfo inputNode = source.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
-            if (inputNode != null) { //prepare you text then fill it using ACTION_SET_TEXT
-                Bundle arguments = new Bundle();
-                // set the NextNumber
-                phoneQueue = new UssdDbHelper(this).getNextPhone();
-                nextPhoneNumber = phoneQueue.getPhoneNumber();
-                Log.d(TAG, "-------------------------------------------------");
-                Log.d(TAG, nextPhoneNumber);
-                writeToLog.log("Checking balance (Running USSD) for " +nextPhoneNumber );
-                Log.d(TAG, "-------------------------------------------------");
-                arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, nextPhoneNumber);
-                inputNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
-            }
-            //"Click" the Send button
-            List<AccessibilityNodeInfo> list = source.findAccessibilityNodeInfosByText("Send");
-            for (AccessibilityNodeInfo node : list) {
-                node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            }
+            try{
+                //capture the EditText simply by using FOCUS_INPUT (since the EditText has the focus), you can probably find it with the viewId input_field
+                AccessibilityNodeInfo inputNode = source.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
+                if (inputNode != null) { //prepare you text then fill it using ACTION_SET_TEXT
+                    Bundle arguments = new Bundle();
+                    // set the NextNumber
+                    phoneQueue = new UssdDbHelper(this).getNextPhone();
+                    if (phoneQueue.getPhoneNumber() != null) {
+                        nextPhoneNumber = phoneQueue.getPhoneNumber();
+                        Log.d(TAG, "-------------------------------------------------");
+                        Log.d(TAG, nextPhoneNumber);
+                        writeToLog.log("Checking balance (Running USSD) for " + nextPhoneNumber);
+                        Log.d(TAG, "-------------------------------------------------");
+                        arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, nextPhoneNumber);
+                        inputNode.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+                    }
+                }
+                //"Click" the Send button
+                List<AccessibilityNodeInfo> list = source.findAccessibilityNodeInfosByText("Send");
+                for (AccessibilityNodeInfo node : list) {
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                }
+            }catch (Exception e){}
         }
 
     }
