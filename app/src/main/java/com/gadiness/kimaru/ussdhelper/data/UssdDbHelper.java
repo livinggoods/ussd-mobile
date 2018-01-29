@@ -130,9 +130,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
     public UssdDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-        if (!isTableExists(UPSTREAM_QUEUE_TABLE)){
-            createUpstreamQueueTable();
-        }
+
     }
 
     @Override
@@ -186,6 +184,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 String.valueOf(phoneQueue.getId()),
         };
         int status=db.delete(PHONE_QUEUE_TABLE_NAME,whereClause,whereArgs);
+        db.close();
         return status;
     }
 
@@ -199,6 +198,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 String.valueOf(message.getId()),
         };
         int status=db.delete(USSD_TABLE_NAME,whereClause,whereArgs);
+        db.close();
         return status;
     }
 
@@ -252,6 +252,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             message.setActive(cursor.getInt(cursor.getColumnIndex(ACTIVE))==1);
             message.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
             message.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
+            db.close();
             return message;
         }
     }
@@ -307,6 +308,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 "0",
         };
         Cursor cursor=db.query(USSD_TABLE_NAME,ussdMessageColumns,whereClause,whereArgs,null,null,null,null);
+        db.close();
         return cursorToJson(cursor, USSD_JSON_ROOT);
     }
 
@@ -391,6 +393,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
             phoneQueues.add(phoneQueue);
         }
+        cursor.close();
         return phoneQueues;
     }
 
@@ -423,6 +426,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
             phoneQueues.add(phoneQueue);
         }
+        cursor.close();
         return phoneQueues;
     }
 
@@ -481,6 +485,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
             phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
+            cursor.close();
             return phoneQueue;
         }
 
@@ -513,6 +518,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             phoneQueue.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
             phoneQueue.setAssignedTo(cursor.getString(cursor.getColumnIndex(ASSIGNED_TO)));
             phoneQueue.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
+            cursor.close();
             return phoneQueue;
         }
 
@@ -642,6 +648,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
             queues.add(cursorToQueue(cursor));
         }
+        cursor.close();
         return queues;
     }
 
@@ -673,6 +680,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 String.valueOf(queue.getId()),
         };
         int status=db.delete(UPSTREAM_QUEUE_TABLE,whereClause,whereArgs);
+        db.close();
         return status;
     }
 
@@ -706,6 +714,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         for (cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
             queues.add(cursorToQueue(cursor));
         }
+        cursor.close();
         return queues;
     }
 
@@ -716,7 +725,9 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 "1",
         };
         Cursor cursor=db.query(UPSTREAM_QUEUE_TABLE,upstreamQueueCols,whereClause,whereArgs,null,null,null, null);
-        return cursorToJson(cursor, UPSTREAM_QUEUE_JSON_ROOT);
+        JSONObject obj =  cursorToJson(cursor, UPSTREAM_QUEUE_JSON_ROOT);
+        cursor.close();
+        return obj;
     }
 
 
