@@ -198,7 +198,6 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 String.valueOf(message.getId()),
         };
         int status=db.delete(USSD_TABLE_NAME,whereClause,whereArgs);
-        db.close();
         return status;
     }
 
@@ -223,7 +222,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
             message.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
             ussdMessages.add(message);
         }
-        db.close();
+        cursor.close();
         return ussdMessages;
     }
 
@@ -238,22 +237,7 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         if (!(cursor.moveToFirst()) || cursor.getCount() ==0){
             return null;
         }else{
-            UssdMessage message=new UssdMessage();
-            message.setId(cursor.getInt(cursor.getColumnIndex(ID)));
-            message.setMessage(cursor.getString(cursor.getColumnIndex(MESSAGE)));
-            message.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
-            message.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
-            message.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
-            message.setBundleBalance(cursor.getInt(cursor.getColumnIndex(BUNDLE_BALANCE)));
-            message.setExpiryDateTime(cursor.getLong(cursor.getColumnIndex(EXPIRY_DATETIME)));
-            message.setMessageTypeId(cursor.getInt(cursor.getColumnIndex(MESSAGE_TYPE_ID)));
-            message.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
-            message.setDateAdded(cursor.getLong(cursor.getColumnIndex(DATE_ADDED)));
-            message.setActive(cursor.getInt(cursor.getColumnIndex(ACTIVE))==1);
-            message.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
-            message.setSynced(cursor.getInt(cursor.getColumnIndex(SYNCED))==1);
-            db.close();
-            return message;
+            return cursorToMessage(cursor);
         }
     }
 
@@ -308,7 +292,6 @@ public class UssdDbHelper extends SQLiteOpenHelper{
                 "0",
         };
         Cursor cursor=db.query(USSD_TABLE_NAME,ussdMessageColumns,whereClause,whereArgs,null,null,null,null);
-        db.close();
         return cursorToJson(cursor, USSD_JSON_ROOT);
     }
 
@@ -635,6 +618,28 @@ public class UssdDbHelper extends SQLiteOpenHelper{
         queue.setSelected(cursor.getInt(cursor.getColumnIndex(SELECTED))==1);
         return queue;
     }
+
+    private UssdMessage cursorToMessage(Cursor cursor){
+        UssdMessage message = new UssdMessage();
+
+        message.setId(cursor.getInt(cursor.getColumnIndex(ID)));
+        message.setMessage(cursor.getString(cursor.getColumnIndex(MESSAGE)));
+        message.setPhoneNumber(cursor.getString(cursor.getColumnIndex(PHONE_NUMBER)));
+        message.setBranchId(cursor.getInt(cursor.getColumnIndex(BRANCH_ID)));
+        message.setPhoneId(cursor.getInt(cursor.getColumnIndex(PHONE_ID)));
+        message.setBundleBalance(cursor.getInt(cursor.getColumnIndex(BUNDLE_BALANCE)));
+        message.setExpiryDateTime(cursor.getLong(cursor.getColumnIndex(EXPIRY_DATETIME)));
+        message.setMessageTypeId(cursor.getInt(cursor.getColumnIndex(MESSAGE_TYPE_ID)));
+        message.setCountry(cursor.getString(cursor.getColumnIndex(COUNTRY)));
+        message.setDateAdded(cursor.getLong(cursor.getColumnIndex(DATE_ADDED)));
+        message.setActive(cursor.getInt(cursor.getColumnIndex(ACTIVE))==1);
+        message.setDeleted(cursor.getInt(cursor.getColumnIndex(DELETED))==1);
+        message.setQueueId(cursor.getInt(cursor.getColumnIndex(QUEUE_ID)));
+
+        return message;
+    }
+
+
     //getting the queue
     public List<Queue> getQueus(){
         SQLiteDatabase db=getReadableDatabase();
