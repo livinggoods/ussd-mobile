@@ -30,6 +30,7 @@ import java.util.TimerTask;
 import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
 import com.gadiness.kimaru.ussdhelper.mzigos.Queue;
+import com.gadiness.kimaru.ussdhelper.mzigos.UssdMessage;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpPost;
 import com.koushikdutta.async.http.body.JSONObjectBody;
@@ -260,44 +261,33 @@ public class ApiSyncHelper {
         protected String doInBackground(String... strings){
             android.util.Log.d("USSD", " Async Task");
             String postResults = null;
-            HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                android.util.Log.d("USSD", "--=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-==--=-==-=-=-=-=-=-=-=-=-");
-                android.util.Log.d("USSD", new UssdDbHelper(context).getMessagesToSyncJson().toString());
-                android.util.Log.d("USSD", "--=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-==--=-==-=-=-=-=-=-=-=-=-");
-
-
-
                 StringBuilder urlString = new StringBuilder();
                 AppPreferences appPreferences = new AppPreferences(context);
-
-
                 urlString.append(appPreferences.getApiServer());
                 urlString.append("/api/");
                 urlString.append(appPreferences.getApiVersion());
                 urlString.append("/");
                 urlString.append(appPreferences.getUssdEndpoint());
                 UssdDbHelper ussdDbHelper = new UssdDbHelper(context);
-                Log.log ("--=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-==--=-==-=-=-=-=-=-=-=-=-");
-                Log.log(ussdDbHelper.getMessagesToSyncJson().toString());
-                Log.log("--=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-==--=-==-=-=-=-=-=-=-=-=-");
                 postResults = postJsonToUrl(
                         ussdDbHelper.getMessagesToSyncJson(),
                         UssdDbHelper.USSD_JSON_ROOT,
                         urlString.toString()
                 );
-                Log.log(TAG +"  -  "+ postResults);
                 // process the messages
+                android.util.Log.d(TAG,  " Message Received  - "+postResults);
                 if (postResults != null){
                     try{
-                        JSONObject results = new JSONObject(postResults);
-                        JSONArray recs = results.getJSONArray(new AppPreferences(context).getPhoneJsonRoot());
+                        // JSONObject results = new JSONObject(postResults);
+                        JSONArray recs = new JSONArray(postResults);
                         for (int x = 0; x < recs.length(); x++){
-                            // since the message has been uploaded, let us delete it
-                            ussdDbHelper.deleteUssdMessage(ussdDbHelper
-                                    .ussdMessageFromJson(recs.getJSONObject(x)));
-                        }
+                            android.util.Log.d(TAG,  " BEFORE MESSAGW for  -  Acknowledged "+recs.getString(x));
+                            UssdMessage ussdMessage = ussdDbHelper.getUssdMessageById(recs.getInt(x));
+                            ussdDbHelper.deleteUssdMessage(ussdMessage);
+                            android.util.Log.d(TAG,  " Message for  - "+ussdMessage.getPhoneNumber() + " Acknowledged");
+                            }
                     } catch (JSONException e){
                         Log.log(TAG + " ERROR getPhoneQueueFromApi() - "+ e.getMessage());
                         android.util.Log.d(TAG,  " ERROR getPhoneQueueFromApi() - "+ e.getMessage());
@@ -306,9 +296,6 @@ public class ApiSyncHelper {
                     Log.log(TAG + " ERROR getPhoneQueueFromApi() - No Stream data received");
                     android.util.Log.d(TAG,  " ERROR getPhoneQueueFromApi() - No Stream data received");
                 }
-
-
-
             } catch (MalformedURLException e){
                 android.util.Log.d("USSD", "MALFORMED URL "+e.getMessage());
                 Log.log("USSD"+" MALFORMED URL ");
