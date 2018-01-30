@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.gadiness.kimaru.ussdhelper.R;
 import com.gadiness.kimaru.ussdhelper.activity.MainActivity;
 import com.gadiness.kimaru.ussdhelper.data.UssdDbHelper;
+import com.gadiness.kimaru.ussdhelper.other.ApiSyncHelper;
 import com.gadiness.kimaru.ussdhelper.other.AppPreferences;
 import com.gadiness.kimaru.ussdhelper.other.WriteToLog;
 
@@ -82,12 +83,25 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_home, container, false);
-        Button runCode = (Button) view.findViewById(R.id.run_ussd);
-        runCode.setOnClickListener(new View.OnClickListener() {
+        View view =  inflater.inflate(R.layout.fragment_actions, container, false);
+        Button buttonGetPhones = (Button) view.findViewById(R.id.buttonGetPhones);
+        Button buttonRunUssd = (Button) view.findViewById(R.id.buttonRunUssd);
+        Button buttonUpload = (Button) view.findViewById(R.id.buttonUpload);
+        Button buttonGetQueues = (Button) view.findViewById(R.id.buttonGetQueues);
+
+        //Listeners
+        buttonGetPhones.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // create a task
+            public void onClick(View v) {
+                new ApiSyncHelper(getContext()).schedulePhoneQueueTask();
+                Toast.makeText(getContext(), "Get Phones from the URL ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        buttonRunUssd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Add action to run tehe USSDs
                 Toast.makeText(getContext(), "Starting the USSD task", Toast.LENGTH_SHORT).show();
                 final Handler handler = new Handler(Looper.getMainLooper());
                 Timer timer = new Timer();
@@ -97,11 +111,10 @@ public class HomeFragment extends Fragment {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                // check if there are any pending numbers to be sent
                                 if (new UssdDbHelper(getContext()).getPhoneQueus().size() > 0){
-                                    android.util.Log.d(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                                    android.util.Log.d(MainActivity.TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                                     dialNumber(new AppPreferences(getContext()).getUssdCode());
-                                    android.util.Log.d(TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                                    android.util.Log.d(MainActivity.TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                                 }
 
 
@@ -109,7 +122,26 @@ public class HomeFragment extends Fragment {
                         });
                     }
                 };
-                timer.schedule(getPhoneTask, 0, 60*1000 / 3); //every 20 seconds
+                timer.schedule(getPhoneTask, 0, 60*1000 / 3);
+            }
+        });
+
+        buttonUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("USSD", "Uploading Messages to the Cloud");
+                writeToLog.log(TAG + " - Starting backgound job to Upload messages " );
+                new ApiSyncHelper(getContext()).scheduleUssdUploadTask();
+                Toast.makeText(getContext(), "Uploading Messages to the Cloud", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
+        buttonGetQueues.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ApiSyncHelper(getContext()).getQueuesTask();
             }
         });
         return view;
@@ -155,6 +187,9 @@ public class HomeFragment extends Fragment {
     }
 
     public void dialNumber(String ussd){
+        if (ussd.endsWith("#")){
+            ussd = ussd.substring(0, ussd.length() - 1);
+        }
         String ussdCode = ussd + Uri.encode("#");
         startActivity(new Intent("android.intent.action.CALL", Uri.parse("tel:" + ussdCode)));
     }
