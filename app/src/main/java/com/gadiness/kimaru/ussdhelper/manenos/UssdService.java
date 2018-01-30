@@ -71,6 +71,14 @@ public class UssdService extends AccessibilityService {
                 for (AccessibilityNodeInfo node : list) {
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                 }
+
+
+            //"Click" the Ok button
+            List<AccessibilityNodeInfo> okButton = source.findAccessibilityNodeInfosByText("OK");
+            for (AccessibilityNodeInfo node : okButton) {
+                node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            }
+
             //}catch (Exception e){}
         }
 
